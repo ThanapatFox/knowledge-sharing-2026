@@ -14,6 +14,14 @@ Docker
 - Deploy on many environments
 - Security
 - One magic command
+    ```
+    https://github.com/ThanapatFox/knowledge-sharing-2026
+    ```
+
+    ``` bash
+    cd db
+    ```
+
     ``` bash
     docker compose up -d
     ```
