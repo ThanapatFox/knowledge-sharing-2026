@@ -1,0 +1,41 @@
+# CI
+# TRIGGER: When do we run this?
+# Run on every "push" to the "main" branch
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+# JOB 1: Continuous Integration (The Gatekeeper)
+# Goal: Check if code is safe to merge
+  test-app:
+    runs-on: ubuntu-latest    
+    steps:
+      - name: 1. Get the code        
+        uses: actions/checkout@v3
+
+      - name: 2. Install dependencies (Simulated)
+        run: echo "Installing npm packages..."
+
+      - name: 3. Run Tests (The Exam)
+        # If this step fails, the pipeline STOPS here.
+        run: echo "Running unit tests... ALL PASSED"
+
+  # JOB 2: Continuous Delivery (The Shipper)
+  # Goal: Package and ship the code
+  build-and-push:
+    needs: test-app # Wait for "test-app" to finish first!
+    runs-on: ubuntu-latest    
+    steps:
+      - name: 1. Get the code (Again)
+        uses: actions/checkout@v3
+      - name: 2. Build Docker Image
+        run: |
+          echo "Building Docker image..."
+          echo "docker build -t my-app:latest ."
+
+      - name: 3. Log in to Docker Hub (Simulated)
+        run: echo "Logging in with secrets..."
+
+      - name: 4. Push Image (Simulated)
+        run: echo "Pushing image to registry... DONE"

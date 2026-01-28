@@ -1,0 +1,53 @@
+# Azure DevOps Pipeline for building ExampleInterface solution with specific NuGet.Config
+
+trigger:
+  branches:
+    include:
+      - azure-artifacts/example-branch  # Trigger only on this branch
+
+workspace:
+  clean: all  # Cleans the whole workspace before the job starts
+
+pool:
+  name: Default
+  demands:
+    - msbuild
+    - visualstudio
+
+variables:
+  solution: '**/Api.sln'  # Specify the path to .sln file
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+
+steps:
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:DeployOnBuild=true /p:WebPublishMethod=Package /p:PackageAsSingleFile=true /p:SkipInvalidConfigurations=true /p:PackageLocation="$(build.artifactStagingDirectory)"'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+
+- task: VSTest@2
+  inputs:
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+  continueOnError: true
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(System.DefaultWorkingDirectory)/ApiInterface/ExampleAPI/bin/Release'
+    ArtifactName: 'ExampleAPI'
+    publishLocation: 'Container'
